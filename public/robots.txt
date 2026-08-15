@@ -1,0 +1,7 @@
+# The customer app is welcome in search results.
+# The staff service board is not — it's a private working screen.
+
+User-agent: *
+Disallow: /admin
+Disallow: /api/
+Allow: /

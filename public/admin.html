@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#173129">
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="icons/favicon-32.png" sizes="32x32">
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<title>Service Board — Arquero's Mountain Resort</title>
+<style>
+  @font-face{font-family:'Fraunces';font-style:normal;font-weight:600;font-display:swap;src:url('fonts/fraunces-latin-600-normal.woff2') format('woff2');}
+  @font-face{font-family:'Fraunces';font-style:normal;font-weight:700;font-display:swap;src:url('fonts/fraunces-latin-700-normal.woff2') format('woff2');}
+  @font-face{font-family:'Inter';font-style:normal;font-weight:400;font-display:swap;src:url('fonts/inter-latin-400-normal.woff2') format('woff2');}
+  @font-face{font-family:'Inter';font-style:normal;font-weight:500;font-display:swap;src:url('fonts/inter-latin-500-normal.woff2') format('woff2');}
+  @font-face{font-family:'Inter';font-style:normal;font-weight:600;font-display:swap;src:url('fonts/inter-latin-600-normal.woff2') format('woff2');}
+  @font-face{font-family:'Inter';font-style:normal;font-weight:700;font-display:swap;src:url('fonts/inter-latin-700-normal.woff2') format('woff2');}
+
+  :root{
+    --forest:#24463a; --forest-dark:#173129; --forest-light:#2f5a49;
+    --terracotta:#a3502c; --terracotta-dark:#8a4222;
+    --cream:#faf5ea; --cream-dark:#f0e6d2;
+    --gold:#d4a24c; --gold-text:#e8c27a;
+    --ink:#26302b; --muted:#586760;
+    --white:#fff; --line:#e2dccb;
+    --tap:44px;
+    --shadow-sm:0 2px 8px rgba(23,49,41,.08);
+    --shadow:0 10px 30px rgba(23,49,41,.16);
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html,body{min-height:100%;}
+  body{
+    font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+    background:var(--cream-dark); color:var(--ink);
+    -webkit-font-smoothing:antialiased; line-height:1.5;
+  }
+  h1,h2,h3{font-family:'Fraunces',Georgia,serif;}
+  button{font:inherit;cursor:pointer;border:none;background:none;color:inherit;}
+  a{color:var(--terracotta);}
+  :focus-visible{outline:3px solid var(--terracotta);outline-offset:2px;border-radius:6px;}
+  .on-dark :focus-visible{outline-color:var(--gold-text);}
+  .visually-hidden{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0;}
+  @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms !important;transition-duration:.01ms !important;}}
+
+  /* ---------- Login ---------- */
+  .login-wrap{
+    min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px;
+    background:
+      radial-gradient(120% 80% at 50% 0%, rgba(212,162,76,.16), transparent 60%),
+      linear-gradient(180deg,var(--forest) 0%, var(--forest-dark) 100%);
+  }
+  .login-card{
+    background:var(--cream); width:100%; max-width:380px; border-radius:20px;
+    padding:32px 26px; box-shadow:var(--shadow);
+  }
+  .login-card .mark{
+    width:48px;height:48px;border-radius:13px;margin-bottom:18px;
+    background:linear-gradient(160deg,var(--gold),#c1653a);
+    display:flex;align-items:center;justify-content:center;
+  }
+  .login-card .mark svg{width:27px;height:27px;}
+  .login-card h1{font-size:23px;font-weight:700;color:var(--forest-dark);}
+  .login-card .sub{font-size:13px;color:var(--muted);margin:5px 0 22px;}
+
+  .field{margin-bottom:15px;}
+  .field label{display:block;font-size:12px;font-weight:600;color:var(--forest-dark);margin-bottom:6px;}
+  .field input, .field select{
+    width:100%;padding:13px;min-height:var(--tap);border-radius:10px;
+    border:1.5px solid #cfc6b4;background:var(--white);
+    font-size:16px;font-family:inherit;color:var(--ink);
+  }
+  .field input:focus, .field select:focus{outline:none;border-color:var(--terracotta);box-shadow:0 0 0 3px rgba(163,80,44,.18);}
+  .form-error{
+    display:none;background:#f7e2d8;border-left:3px solid var(--terracotta-dark);
+    color:#7a3a1f;font-size:13px;font-weight:600;padding:11px 13px;border-radius:8px;margin-bottom:15px;
+  }
+  .form-error.show{display:block;}
+
+  .btn{
+    display:inline-flex;align-items:center;justify-content:center;gap:7px;
+    min-height:var(--tap);padding:12px 18px;border-radius:11px;
+    font-size:13.5px;font-weight:600;transition:transform .12s ease;
+  }
+  .btn:active{transform:scale(.98);}
+  .btn:disabled{opacity:.5;cursor:not-allowed;}
+  .btn-primary{background:var(--terracotta);color:#fff;}
+  .btn-block{width:100%;}
+  .btn-quiet{background:var(--cream-dark);color:var(--forest-dark);}
+  .btn-ghost{background:rgba(255,255,255,.14);color:var(--cream);border:1px solid rgba(255,255,255,.4);}
+  /* Staff tap these mid-service, often on a phone, sometimes with cold hands.
+     They stay visually compact but keep the full 44px target. */
+  .btn-sm{min-height:var(--tap);padding:10px 14px;font-size:12.5px;border-radius:10px;}
+
+  .skip-link{
+    position:absolute;left:8px;top:-60px;z-index:100;
+    display:flex;align-items:center;min-height:var(--tap);
+    background:var(--forest-dark);color:var(--cream);
+    padding:10px 16px;border-radius:0 0 10px 10px;font-size:13px;font-weight:600;
+    transition:top .15s ease;
+  }
+  .skip-link:focus{top:0;}
+
+  /* ---------- Shell ---------- */
+  .board{display:none;}
+  .board.show{display:block;}
+
+  .topbar{
+    background:var(--forest-dark);color:var(--cream);
+    padding:14px 20px calc(14px + env(safe-area-inset-bottom, 0px) * 0);
+    display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;
+    position:sticky;top:0;z-index:30;box-shadow:0 2px 14px rgba(0,0,0,.22);
+  }
+  .topbar .who{display:flex;align-items:center;gap:12px;min-width:0;}
+  .topbar .mark{
+    width:38px;height:38px;border-radius:10px;flex-shrink:0;
+    background:linear-gradient(160deg,var(--gold),#c1653a);
+    display:flex;align-items:center;justify-content:center;
+  }
+  .topbar .mark svg{width:22px;height:22px;}
+  .topbar h1{font-size:17px;font-weight:700;line-height:1.2;}
+  .topbar .sub{font-size:11px;color:var(--gold-text);text-transform:uppercase;letter-spacing:.7px;font-weight:600;}
+  .topbar .right{display:flex;align-items:center;gap:10px;}
+  .topbar .staff{font-size:12.5px;color:#c9d6cd;}
+
+  .wrap{max-width:1180px;margin:0 auto;padding:20px;}
+
+  /* ---------- Date bar ---------- */
+  .datebar{
+    display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+    background:var(--white);border-radius:14px;padding:12px 14px;box-shadow:var(--shadow-sm);
+    margin-bottom:16px;
+  }
+  .datebar .nav{
+    width:var(--tap);height:var(--tap);border-radius:11px;background:var(--cream-dark);
+    display:flex;align-items:center;justify-content:center;
+  }
+  .datebar .nav svg{width:17px;height:17px;stroke:var(--forest-dark);stroke-width:2.4;fill:none;}
+  .datebar .label{flex:1;min-width:170px;}
+  .datebar .label .d{font-family:'Fraunces',Georgia,serif;font-size:18px;font-weight:700;color:var(--forest-dark);}
+  .datebar .label .rel{font-size:12px;color:var(--muted);}
+  .datebar input[type="date"]{
+    min-height:var(--tap);padding:9px 12px;border-radius:10px;border:1.5px solid #cfc6b4;
+    background:var(--white);font:inherit;font-size:14px;color:var(--ink);
+  }
+
+  /* ---------- Stats ---------- */
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(148px,1fr));gap:12px;margin-bottom:22px;}
+  .stat{background:var(--white);border-radius:14px;padding:14px 16px;box-shadow:var(--shadow-sm);}
+  .stat .k{font-size:10.5px;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);font-weight:700;}
+  .stat .v{font-family:'Fraunces',Georgia,serif;font-size:25px;font-weight:700;color:var(--forest-dark);margin-top:3px;}
+  .stat.accent{background:var(--forest);}
+  .stat.accent .k{color:var(--gold-text);}
+  .stat.accent .v{color:var(--cream);}
+
+  /* ---------- Columns ---------- */
+  .cols{display:grid;grid-template-columns:1fr;gap:22px;}
+  @media (min-width:900px){.cols{grid-template-columns:1fr 1fr;align-items:start;}}
+
+  .col-head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:12px;gap:10px;}
+  .col-head h2{font-size:19px;font-weight:700;color:var(--forest-dark);}
+  .col-head .count{font-size:12.5px;color:var(--muted);font-weight:600;}
+
+  .card{
+    background:var(--white);border-radius:14px;padding:15px 16px;
+    box-shadow:var(--shadow-sm);margin-bottom:12px;
+    border-left:4px solid var(--line);
+  }
+  .card.is-received{border-left-color:var(--gold);}
+  .card.is-preparing{border-left-color:var(--terracotta);}
+  .card.is-ready{border-left-color:var(--forest-light);}
+  /* Finished cards recede via a tinted background, NOT opacity — dimming the
+     whole card would drag the phone number and reference below the contrast
+     minimum exactly when someone is squinting to read it back to a customer. */
+  .card.is-collected,.card.is-cancelled,.card.is-no_show{
+    border-left-color:var(--line);
+    background:#f3efe4;
+    box-shadow:none;
+  }
+  .card.is-confirmed{border-left-color:var(--gold);}
+  .card.is-arrived{border-left-color:var(--forest-light);}
+
+  .card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:8px;}
+  .card-top .who{min-width:0;}
+  .card-top .name{font-size:15px;font-weight:700;color:var(--forest-dark);word-break:break-word;}
+  .card-top .meta{font-size:12px;color:var(--muted);margin-top:2px;}
+  /* Phone numbers are tapped to call a customer, so give the inline link a
+     real target rather than a 15px-tall strip of text. */
+  .card-top .meta a{
+    font-weight:600;text-decoration:underline;text-underline-offset:2px;
+    display:inline-block;padding:5px 2px;
+  }
+  .card-top .amount{text-align:right;flex-shrink:0;}
+  .card-top .amount .n{font-size:15px;font-weight:700;color:var(--forest-dark);}
+  .card-top .amount .ref{font-size:10.5px;color:var(--muted);font-family:ui-monospace,SFMono-Regular,Menlo,monospace;}
+
+  .chip{
+    display:inline-block;font-size:10.5px;font-weight:700;text-transform:uppercase;
+    letter-spacing:.6px;padding:4px 9px;border-radius:20px;
+  }
+  .chip-received{background:#efe3c4;color:#5c4410;}
+  .chip-preparing{background:#f6ddd0;color:#7a3a1f;}
+  .chip-ready{background:#cfe4d8;color:#164032;}
+  .chip-collected{background:#e3e7e2;color:#414b42;}
+  .chip-cancelled{background:#e3e7e2;color:#414b42;}
+  .chip-confirmed{background:#efe3c4;color:#5c4410;}
+  .chip-arrived{background:#cfe4d8;color:#164032;}
+  .chip-no_show{background:#f6ddd0;color:#7a3a1f;}
+
+  .lines{
+    background:var(--cream);border-radius:10px;padding:10px 12px;margin:10px 0;
+    font-size:13px;
+  }
+  .lines .line{display:flex;justify-content:space-between;gap:12px;padding:2px 0;}
+  .lines .line .q{font-weight:700;color:var(--forest-dark);}
+
+  .slot-time{
+    font-family:'Fraunces',Georgia,serif;font-size:17px;font-weight:700;
+    color:var(--forest-dark);
+  }
+  .slot-court{font-size:12px;color:var(--muted);font-weight:600;}
+
+  .actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:11px;padding-top:11px;border-top:1px solid var(--cream-dark);}
+  .btn-danger{background:#f6ddd0;color:#7a3a1f;}
+
+  .empty{
+    background:var(--white);border-radius:14px;padding:34px 20px;text-align:center;
+    color:var(--muted);font-size:13.5px;box-shadow:var(--shadow-sm);
+  }
+  .empty svg{width:38px;height:38px;stroke:#a9b3aa;fill:none;stroke-width:1.6;margin:0 auto 10px;display:block;}
+
+  .footer-note{
+    display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;
+    margin:26px 0 40px;font-size:12px;color:var(--muted);
+  }
+  .live-dot{width:7px;height:7px;border-radius:50%;background:var(--forest-light);display:inline-block;margin-right:6px;}
+
+  .banner{
+    display:none;background:#f7e2d8;border-left:3px solid var(--terracotta-dark);color:#7a3a1f;
+    font-size:13px;font-weight:600;padding:11px 14px;border-radius:8px;margin-bottom:16px;
+  }
+  .banner.show{display:block;}
+
+  /* ---------- View tabs ---------- */
+  .viewtabs{display:flex;gap:4px;background:rgba(255,255,255,.10);padding:3px;border-radius:12px;}
+  .viewtab{
+    min-height:38px;padding:8px 14px;border-radius:9px;
+    font-size:12.5px;font-weight:600;color:#cbd8d0;white-space:nowrap;
+  }
+  .viewtab[aria-selected="true"]{background:var(--cream);color:var(--forest-dark);}
+
+  /* ---------- Management panels ---------- */
+  .panel{
+    background:var(--white);border-radius:16px;padding:18px 20px;
+    box-shadow:var(--shadow-sm);margin-bottom:20px;
+  }
+  .panel-head{
+    display:flex;align-items:flex-start;justify-content:space-between;gap:16px;
+    flex-wrap:wrap;margin-bottom:14px;
+  }
+  .panel-head h2{font-size:19px;font-weight:700;color:var(--forest-dark);}
+  .panel-note{font-size:12.5px;color:var(--muted);max-width:62ch;margin-top:3px;}
+
+  .cat-head{
+    font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;
+    color:var(--muted);margin:16px 0 8px;padding-top:12px;border-top:1px solid var(--cream-dark);
+  }
+  .panel > div > .cat-head:first-child{margin-top:0;padding-top:0;border-top:none;}
+
+  .row{
+    display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+    padding:9px 10px;border-radius:11px;
+  }
+  .row + .row{margin-top:4px;}
+  .row:hover{background:var(--cream);}
+  .row.inactive{opacity:.62;}
+  .row .swatch{
+    width:38px;height:38px;border-radius:10px;flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;font-size:19px;
+  }
+  .row .grow{flex:1;min-width:150px;}
+  .row .rname{font-size:14px;font-weight:600;color:var(--forest-dark);word-break:break-word;}
+  .row .rdesc{font-size:11.5px;color:var(--muted);}
+  .row .rprice{font-size:14px;font-weight:700;color:var(--forest-dark);white-space:nowrap;}
+  .row .rprice small{display:block;font-size:10.5px;font-weight:400;color:var(--muted);}
+  .row .ractions{display:flex;gap:6px;flex-wrap:wrap;}
+  .row .icon-sm{
+    width:var(--tap);height:var(--tap);border-radius:10px;
+    display:flex;align-items:center;justify-content:center;position:relative;
+  }
+  .row .icon-sm::before{content:'';position:absolute;width:32px;height:32px;border-radius:9px;background:var(--cream-dark);}
+  .row .icon-sm svg{width:15px;height:15px;position:relative;stroke:var(--forest-dark);stroke-width:2.6;fill:none;}
+  .row .icon-sm:disabled{opacity:.35;cursor:not-allowed;}
+  .tag-off{
+    font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;
+    background:#e3e7e2;color:#414b42;padding:3px 8px;border-radius:20px;
+  }
+
+  .change{
+    display:flex;gap:10px;font-size:12.5px;padding:7px 0;
+    border-bottom:1px solid var(--cream-dark);
+  }
+  .change:last-child{border-bottom:none;}
+  .change time{color:var(--muted);white-space:nowrap;font-variant-numeric:tabular-nums;}
+  .change .what b{color:var(--forest-dark);}
+  .change .what span{color:var(--muted);}
+
+  /* ---------- Modals ---------- */
+  .overlay{
+    position:fixed;inset:0;background:rgba(23,49,41,.55);
+    z-index:60;display:none;align-items:center;justify-content:center;padding:20px;
+  }
+  .overlay.show{display:flex;}
+  .modal{
+    background:var(--cream);width:100%;max-width:460px;border-radius:18px;
+    padding:26px 24px;box-shadow:var(--shadow);position:relative;
+    max-height:88vh;overflow-y:auto;
+  }
+  .modal:focus{outline:none;}
+  .modal h3{font-size:19px;font-weight:700;color:var(--forest-dark);margin-bottom:16px;padding-right:44px;}
+  .modal .close-x{
+    position:absolute;top:10px;right:10px;
+    width:var(--tap);height:var(--tap);border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .modal .close-x::before{content:'';position:absolute;width:32px;height:32px;border-radius:50%;background:var(--cream-dark);}
+  .modal .close-x svg{width:15px;height:15px;position:relative;stroke:var(--forest-dark);stroke-width:2.5;}
+  .modal .hint{display:block;font-size:11.5px;color:var(--muted);margin-top:5px;}
+  .row-2{display:grid;grid-template-columns:2fr 1fr;gap:12px;}
+  .colour-row{display:flex;align-items:center;gap:12px;}
+  .colour-row input[type="color"]{
+    width:56px;height:var(--tap);padding:3px;border-radius:10px;
+    border:1.5px solid #cfc6b4;background:var(--white);cursor:pointer;
+  }
+  .swatch-preview{
+    width:var(--tap);height:var(--tap);border-radius:11px;
+    display:flex;align-items:center;justify-content:center;font-size:21px;
+    border:1px solid var(--line);
+  }
+  .modal-actions{display:flex;gap:10px;margin-top:20px;}
+  .modal-actions .btn{flex:1;}
+
+  /* ---------- Kitchen ticket ----------
+     Screens are fine until the pass gets busy. This prints one order as a
+     paper ticket for the rail: order number and items large enough to read
+     at arm's length, no interface furniture. */
+  #printArea{display:none;}
+
+  @media print{
+    /* Hide the working board, show only the ticket. */
+    body > *{display:none !important;}
+    #printArea{display:block !important;}
+
+    @page{margin:12mm;}
+    body{background:#fff;color:#000;font-size:12pt;}
+
+    .ticket{max-width:80mm;}
+    .ticket .brand{
+      font-family:'Fraunces',Georgia,serif;font-size:15pt;font-weight:700;
+      border-bottom:2px solid #000;padding-bottom:5pt;margin-bottom:8pt;
+    }
+    .ticket .brand small{display:block;font-family:inherit;font-size:9pt;font-weight:400;letter-spacing:1pt;text-transform:uppercase;}
+    .ticket .ref{font-size:20pt;font-weight:700;font-family:ui-monospace,Menlo,monospace;letter-spacing:-.5pt;}
+    .ticket .when{font-size:10pt;margin:2pt 0 10pt;}
+    .ticket .who{font-size:12pt;font-weight:700;}
+    .ticket .who span{display:block;font-size:10pt;font-weight:400;}
+    .ticket .type{
+      display:inline-block;border:1.5pt solid #000;padding:2pt 7pt;border-radius:3pt;
+      font-size:10pt;font-weight:700;text-transform:uppercase;margin:7pt 0;
+    }
+    .ticket table{width:100%;border-collapse:collapse;margin:8pt 0;}
+    .ticket td{padding:4pt 0;vertical-align:top;border-bottom:1px dotted #999;}
+    .ticket td.q{font-size:15pt;font-weight:700;width:34pt;}
+    .ticket td.n{font-size:13pt;font-weight:600;}
+    .ticket td.p{text-align:right;font-size:11pt;white-space:nowrap;}
+    .ticket .totals{border-top:2px solid #000;padding-top:6pt;font-size:11pt;}
+    .ticket .totals div{display:flex;justify-content:space-between;padding:1pt 0;}
+    .ticket .totals .grand{font-size:14pt;font-weight:700;margin-top:3pt;}
+    .ticket .foot{margin-top:12pt;font-size:9pt;border-top:1px dashed #000;padding-top:6pt;}
+  }
+</style>
+</head>
+<body>
+
+<!-- ---------------- LOGIN ---------------- -->
+<div class="login-wrap" id="loginView">
+  <div class="login-card">
+    <div class="mark" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#173129" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 20l6-10 4 6 3-4 5 8H3z"/><circle cx="17" cy="6" r="2"/></svg>
+    </div>
+    <h1>Service Board</h1>
+    <p class="sub">Arquero's Mountain Resort — staff only</p>
+
+    <div class="form-error" id="loginError" role="alert"></div>
+
+    <form id="loginForm" novalidate>
+      <div class="field">
+        <label for="username">Username</label>
+        <input type="text" id="username" name="username" autocomplete="username" value="admin" required>
+      </div>
+      <div class="field">
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" autocomplete="current-password" required>
+      </div>
+      <button type="submit" class="btn btn-primary btn-block" id="loginBtn">Log in</button>
+    </form>
+  </div>
+</div>
+
+<!-- ---------------- BOARD ---------------- -->
+<div class="board" id="boardView">
+  <a class="skip-link" href="#ordersList">Skip to today's orders</a>
+  <header class="topbar on-dark">
+    <div class="who">
+      <div class="mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#173129" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 20l6-10 4 6 3-4 5 8H3z"/><circle cx="17" cy="6" r="2"/></svg>
+      </div>
+      <div>
+        <div class="sub">Arquero's Mountain Resort</div>
+        <h1>Service Board</h1>
+      </div>
+    </div>
+    <div class="right">
+      <div class="viewtabs" role="tablist" aria-label="Board section">
+        <button class="viewtab" type="button" role="tab" data-view="service" aria-selected="true">Service</button>
+        <button class="viewtab" type="button" role="tab" data-view="manage" aria-selected="false">Menu &amp; courts</button>
+      </div>
+      <span class="staff" id="staffName"></span>
+      <button class="btn btn-ghost btn-sm" type="button" id="logoutBtn">Log out</button>
+    </div>
+  </header>
+
+  <div class="wrap">
+    <div class="banner" id="banner" role="alert"></div>
+    <!-- Announces the result of an action. The lists themselves are NOT live
+         regions: they redraw every 20 seconds, and a screen reader would read
+         the whole board out again each time. -->
+    <p class="visually-hidden" id="srStatus" role="status" aria-live="polite"></p>
+
+    <!-- ============ SERVICE ============ -->
+    <div id="serviceView">
+    <div class="datebar">
+      <button class="nav" type="button" id="prevDay" aria-label="Previous day">
+        <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>
+      </button>
+      <div class="label">
+        <div class="d" id="dateLabel">—</div>
+        <div class="rel" id="dateRel"></div>
+      </div>
+      <button class="nav" type="button" id="nextDay" aria-label="Next day">
+        <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18l6-6-6-6"/></svg>
+      </button>
+      <label class="visually-hidden" for="datePick">Jump to a date</label>
+      <input type="date" id="datePick">
+      <button class="btn btn-quiet btn-sm" type="button" id="todayBtn">Today</button>
+    </div>
+
+    <div class="stats" id="stats"></div>
+
+    <div class="cols">
+      <section aria-labelledby="ordersHeading">
+        <div class="col-head">
+          <h2 id="ordersHeading">Kitchen</h2>
+          <span class="count" id="ordersCount"></span>
+        </div>
+        <div id="ordersList"></div>
+      </section>
+
+      <section aria-labelledby="courtsHeading">
+        <div class="col-head">
+          <h2 id="courtsHeading">Courts</h2>
+          <span class="count" id="courtsCount"></span>
+        </div>
+        <div id="bookingsList"></div>
+      </section>
+    </div>
+
+    <div class="footer-note">
+      <span><span class="live-dot" aria-hidden="true"></span><span id="refreshNote">Updating automatically</span></span>
+      <button class="btn btn-quiet btn-sm" type="button" id="refreshBtn">Refresh now</button>
+    </div>
+    </div><!-- /serviceView -->
+
+    <!-- ============ MENU & COURTS ============ -->
+    <div id="manageView" hidden>
+      <div class="banner" id="manageBanner" role="alert"></div>
+      <p class="visually-hidden" id="manageStatus" role="status" aria-live="polite"></p>
+
+      <section class="panel" aria-labelledby="courtsManageHeading">
+        <div class="panel-head">
+          <div>
+            <h2 id="courtsManageHeading">Courts</h2>
+            <p class="panel-note">Taking a court out of service hides it from customers. Existing bookings are not cancelled.</p>
+          </div>
+          <button class="btn btn-primary btn-sm" type="button" id="addCourtBtn">Add court</button>
+        </div>
+        <div id="courtRows"></div>
+      </section>
+
+      <section class="panel" aria-labelledby="menuManageHeading">
+        <div class="panel-head">
+          <div>
+            <h2 id="menuManageHeading">Menu</h2>
+            <p class="panel-note">Prices include VAT — what you type here is what the customer pays. Removing a dish keeps it out of the app but leaves past orders intact.</p>
+          </div>
+          <button class="btn btn-primary btn-sm" type="button" id="addDishBtn">Add dish</button>
+        </div>
+        <div id="menuRows"></div>
+      </section>
+
+      <section class="panel" aria-labelledby="changesHeading">
+        <div class="panel-head"><h2 id="changesHeading">Recent changes</h2></div>
+        <div id="changeLog"></div>
+      </section>
+    </div>
+  </div>
+</div>
+
+<!-- ============ DISH EDITOR ============ -->
+<div class="overlay" id="dishOverlay" data-backdrop-close>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="dishTitle" tabindex="-1">
+    <button class="close-x" type="button" data-close="dishOverlay" aria-label="Close">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" aria-hidden="true"><path d="M18 6L6 18M6 6l12 12"/></svg>
+    </button>
+    <h3 id="dishTitle">Edit dish</h3>
+    <div class="form-error" id="dishError" role="alert"></div>
+
+    <form id="dishForm" novalidate>
+      <div class="field">
+        <label for="dishName">Name</label>
+        <input type="text" id="dishName" maxlength="60" required autocomplete="off">
+      </div>
+      <div class="field">
+        <label for="dishCategory">Category</label>
+        <input type="text" id="dishCategory" maxlength="40" list="categoryList" required autocomplete="off">
+        <datalist id="categoryList"></datalist>
+        <span class="hint">Type a new name to start a new section of the menu.</span>
+      </div>
+      <div class="field">
+        <label for="dishDescription">Description</label>
+        <input type="text" id="dishDescription" maxlength="200" autocomplete="off">
+      </div>
+      <div class="row-2">
+        <div class="field">
+          <label for="dishPrice">Price (₱, incl. VAT)</label>
+          <input type="number" id="dishPrice" min="0" max="100000" step="1" required>
+        </div>
+        <div class="field">
+          <label for="dishEmoji">Icon</label>
+          <input type="text" id="dishEmoji" maxlength="8" autocomplete="off" placeholder="🍔">
+        </div>
+      </div>
+      <div class="field">
+        <label for="dishThumb">Tile colour</label>
+        <div class="colour-row">
+          <input type="color" id="dishThumb" value="#f0e6d2">
+          <span class="swatch-preview" id="dishPreview" aria-hidden="true">🍔</span>
+          <span class="hint" id="dishPriceHint"></span>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-primary" type="submit" id="dishSaveBtn">Save</button>
+        <button class="btn btn-quiet" type="button" data-close="dishOverlay">Cancel</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ============ COURT EDITOR ============ -->
+<div class="overlay" id="courtOverlay" data-backdrop-close>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="courtTitle" tabindex="-1">
+    <button class="close-x" type="button" data-close="courtOverlay" aria-label="Close">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" aria-hidden="true"><path d="M18 6L6 18M6 6l12 12"/></svg>
+    </button>
+    <h3 id="courtTitle">Edit court</h3>
+    <div class="form-error" id="courtError" role="alert"></div>
+    <form id="courtForm" novalidate>
+      <div class="field">
+        <label for="courtName">Court name</label>
+        <input type="text" id="courtName" maxlength="40" required autocomplete="off">
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-primary" type="submit" id="courtSaveBtn">Save</button>
+        <button class="btn btn-quiet" type="button" data-close="courtOverlay">Cancel</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Filled in only when someone prints a ticket. -->
+<div id="printArea" aria-hidden="true"></div>
+
+<script src="safe-html.js" defer></script>
+<script src="money.js" defer></script>
+<script src="admin.js" defer></script>
+</body>
+</html>

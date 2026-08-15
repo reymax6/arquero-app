@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<!-- Zoom deliberately left enabled: pinching to enlarge is essential for low-vision users. -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#24463a">
+<link rel="icon" href="icons/favicon-32.png" sizes="32x32">
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Arquero's">
+<meta name="description" content="Order from the restaurant and book a pickleball court at Arquero's Mountain Resort.">
+<title>Arquero's Mountain Resort</title>
+<style>
+  /* Self-hosted fonts — no external CDN, works offline and keeps visitor data private */
+  @font-face{font-family:'Fraunces';font-style:normal;font-weight:500;font-display:swap;src:url('fonts/fraunces-latin-500-normal.woff2') format('woff2');}
+  @font-face{font-family:'Fraunces';font-style:normal;font-weight:600;font-display:swap;src:url('fonts/fraunces-latin-600-normal.woff2') format('woff2');}
+  @font-face{font-family:'Fraunces';font-style:normal;font-weight:700;font-display:swap;src:url('fonts/fraunces-latin-700-normal.woff2') format('woff2');}
+  @font-face{font-family:'Inter';font-style:normal;font-weight:400;font-display:swap;src:url('fonts/inter-latin-400-normal.woff2') format('woff2');}
+  @font-face{font-family:'Inter';font-style:normal;font-weight:500;font-display:swap;src:url('fonts/inter-latin-500-normal.woff2') format('woff2');}
+  @font-face{font-family:'Inter';font-style:normal;font-weight:600;font-display:swap;src:url('fonts/inter-latin-600-normal.woff2') format('woff2');}
+  @font-face{font-family:'Inter';font-style:normal;font-weight:700;font-display:swap;src:url('fonts/inter-latin-700-normal.woff2') format('woff2');}
+
+  :root{
+    --forest:#24463a;
+    --forest-dark:#173129;
+    --forest-light:#2f5a49;
+    /* Terracotta darkened from #c1653a so it clears 4.5:1 against white and cream,
+       both as text and as a button background. */
+    --terracotta:#a3502c;
+    --terracotta-dark:#8a4222;
+    --terracotta-soft:#c1653a;   /* decorative only — gradients and glows, never text */
+    --cream:#faf5ea;
+    --cream-dark:#f0e6d2;
+    --gold:#d4a24c;              /* decorative — icon fills, gradients */
+    --gold-text:#e8c27a;         /* lighter gold used wherever gold carries words */
+    --ink:#26302b;
+    --muted:#586760;             /* darkened from #6b7a71 for readable body text */
+    --muted-soft:#5f675d;
+    --white:#ffffff;
+    --radius:16px;
+    --shadow:0 8px 24px rgba(23,49,41,0.12);
+    --shadow-sm:0 2px 8px rgba(23,49,41,0.08);
+    --tap:44px;                  /* comfortable minimum touch target */
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html,body{height:100%;}
+  body{
+    font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+    background:var(--cream-dark);
+    color:var(--ink);
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3,.brand{font-family:'Fraunces',Georgia,serif;}
+  button{font-family:inherit; cursor:pointer; border:none; background:none; color:inherit;}
+  a{color:inherit; text-decoration:none;}
+  img{max-width:100%; display:block;}
+
+  /* Visible, high-contrast focus ring for keyboard users on every interactive thing */
+  :focus-visible{
+    outline:3px solid var(--terracotta);
+    outline-offset:2px;
+    border-radius:6px;
+  }
+  .on-dark :focus-visible, .topbar :focus-visible, .hero :focus-visible{
+    outline-color:var(--gold-text);
+  }
+  .visually-hidden{
+    position:absolute; width:1px; height:1px; padding:0; margin:-1px;
+    overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; border:0;
+  }
+  .skip-link{
+    position:absolute; left:8px; top:-60px; z-index:100;
+    background:var(--forest-dark); color:var(--cream);
+    display:flex; align-items:center; min-height:var(--tap);
+    padding:10px 16px; border-radius:0 0 10px 10px; font-size:13px; font-weight:600;
+    transition:top .15s ease;
+  }
+  .skip-link:focus{top:0;}
+
+  @media (prefers-reduced-motion:reduce){
+    *,*::before,*::after{animation-duration:.01ms !important; transition-duration:.01ms !important;}
+  }
+
+  /* App shell */
+  .app{
+    max-width:480px;
+    margin:0 auto;
+    min-height:100vh;
+    background:var(--cream);
+    position:relative;
+    display:flex;
+    flex-direction:column;
+    box-shadow:0 0 40px rgba(0,0,0,0.15);
+  }
+  @media (min-width:481px){
+    body{background:var(--forest-dark);}
+    .app{min-height:100vh; max-height:960px; margin:20px auto; border-radius:28px; overflow:hidden;}
+  }
+
+  /* Header */
+  .topbar{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:12px 14px;
+    background:var(--forest);
+    color:var(--cream);
+    position:sticky; top:0; z-index:20;
+  }
+  .topbar .brand{
+    display:flex; align-items:center; gap:10px;
+    font-size:17px; font-weight:600; letter-spacing:.2px;
+    padding-left:4px;
+  }
+  .logo-mark{
+    width:34px; height:34px; border-radius:9px;
+    background:linear-gradient(160deg, var(--gold), var(--terracotta-soft));
+    display:flex; align-items:center; justify-content:center;
+    flex-shrink:0;
+  }
+  .logo-mark svg{width:20px; height:20px;}
+  .brand small{display:block; font-family:'Inter'; font-weight:500; font-size:10.5px; color:var(--gold-text); letter-spacing:.6px; text-transform:uppercase;}
+  .icon-btn{
+    width:var(--tap); height:var(--tap); border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    position:relative;
+  }
+  .icon-btn::before{
+    content:''; position:absolute; width:38px; height:38px; border-radius:50%;
+    background:rgba(255,255,255,0.12);
+  }
+  .icon-btn svg{width:19px; height:19px; stroke:var(--cream); position:relative;}
+  .badge{
+    position:absolute; top:1px; right:1px;
+    background:var(--terracotta-soft); color:#fff;
+    font-size:10px; font-weight:700;
+    min-width:18px; height:18px; border-radius:9px;
+    display:flex; align-items:center; justify-content:center;
+    padding:0 4px;
+    border:2px solid var(--forest);
+  }
+  /* display:flex above would otherwise defeat the [hidden] attribute */
+  .badge[hidden]{display:none;}
+
+  /* Screens */
+  .screens{flex:1; overflow-y:auto; padding-bottom:96px; -webkit-overflow-scrolling:touch;}
+  .screen{display:none; animation:fadeIn .25s ease;}
+  .screen.active{display:block;}
+  @keyframes fadeIn{from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);}}
+
+  /* Hero */
+  .hero{
+    position:relative;
+    padding:34px 20px 46px;
+    background:
+      radial-gradient(120% 100% at 50% 0%, rgba(212,162,76,0.20), transparent 60%),
+      linear-gradient(180deg, var(--forest) 0%, var(--forest-dark) 100%);
+    color:var(--cream);
+    overflow:hidden;
+  }
+  .hero-tag{
+    display:inline-block; font-size:11px; letter-spacing:1.2px; text-transform:uppercase;
+    color:var(--gold-text); font-weight:600; margin-bottom:10px;
+  }
+  .hero h1{font-size:26px; line-height:1.25; font-weight:600; margin-bottom:8px;}
+  .hero p{font-size:13.5px; color:#e2ebe5; max-width:34ch; line-height:1.5;}
+  .hero-actions{display:flex; gap:10px; margin-top:20px; position:relative; z-index:2; flex-wrap:wrap;}
+
+  .btn{
+    padding:13px 18px; border-radius:12px; font-weight:600; font-size:13.5px;
+    display:inline-flex; align-items:center; gap:6px; justify-content:center;
+    min-height:var(--tap);
+    transition:transform .15s ease, box-shadow .15s ease;
+  }
+  .btn:active{transform:scale(0.97);}
+  .btn-primary{background:var(--terracotta); color:#fff; box-shadow:0 6px 16px rgba(138,66,34,0.32);}
+  .btn-gold{background:var(--gold); color:var(--forest-dark); box-shadow:0 6px 16px rgba(212,162,76,0.35);}
+  .btn-outline{background:rgba(255,255,255,0.12); color:var(--cream); border:1px solid rgba(255,255,255,0.45);}
+  .btn-block{width:100%;}
+  .btn-dark{background:var(--forest); color:var(--cream);}
+  .btn:disabled{opacity:.5; cursor:not-allowed;}
+
+  .section{padding:22px 18px;}
+  .section-head{display:flex; align-items:baseline; justify-content:space-between; margin-bottom:14px;}
+  .section-head h2{font-size:18px; font-weight:600; color:var(--forest-dark);}
+
+  /* Quick info strip */
+  .quick-strip{
+    display:grid; grid-template-columns:repeat(3,1fr); gap:10px;
+    margin-top:-28px; position:relative; z-index:3; padding:0 18px;
+  }
+  .quick-card{
+    background:var(--white); border-radius:14px; padding:12px 8px;
+    text-align:center; box-shadow:var(--shadow-sm);
+  }
+  .quick-card svg{width:18px; height:18px; stroke:var(--terracotta); margin:0 auto 6px;}
+  .quick-card .q-label{font-size:10.5px; color:var(--muted); font-weight:600; text-transform:uppercase; letter-spacing:.3px;}
+  .quick-card .q-value{font-size:12.5px; font-weight:700; color:var(--forest-dark); margin-top:2px;}
+
+  /* Cards */
+  .card{
+    background:var(--white); border-radius:var(--radius);
+    box-shadow:var(--shadow-sm); overflow:hidden;
+  }
+  .scroll-row{display:flex; gap:12px; overflow-x:auto; padding:4px; scrollbar-width:none;}
+  .scroll-row::-webkit-scrollbar{display:none;}
+  .promo-card{
+    min-width:210px; border-radius:16px; padding:16px;
+    background:linear-gradient(135deg, var(--forest-light), var(--forest-dark));
+    color:var(--cream); flex-shrink:0;
+  }
+  .promo-card .tag{font-size:10px; text-transform:uppercase; letter-spacing:.8px; color:var(--gold-text); font-weight:700;}
+  .promo-card h3{font-size:15px; margin:6px 0 4px; font-weight:600;}
+  .promo-card p{font-size:12px; color:#e6efe9; line-height:1.4;}
+
+  .amenity-grid{display:grid; grid-template-columns:1fr 1fr; gap:12px;}
+  .amenity{
+    border-radius:14px; padding:14px; background:var(--white); box-shadow:var(--shadow-sm);
+  }
+  .amenity .em{
+    width:36px; height:36px; border-radius:10px; display:flex; align-items:center; justify-content:center;
+    background:var(--cream-dark); margin-bottom:8px;
+  }
+  .amenity .em svg{width:18px; height:18px; stroke:var(--forest);}
+  .amenity h4{font-size:13.5px; font-weight:600; margin-bottom:3px;}
+  .amenity p{font-size:11.5px; color:var(--muted); line-height:1.4;}
+
+  /* Menu */
+  .tabs{display:flex; gap:8px; overflow-x:auto; padding:4px 18px 14px; scrollbar-width:none;}
+  .tabs::-webkit-scrollbar{display:none;}
+  .tab{
+    padding:12px 16px; min-height:var(--tap); border-radius:22px; font-size:12.5px; font-weight:600;
+    background:var(--white); color:var(--forest-dark); white-space:nowrap; box-shadow:var(--shadow-sm);
+    flex-shrink:0;
+  }
+  .tab[aria-selected="true"]{background:var(--forest); color:var(--cream);}
+
+  .menu-item{
+    display:flex; gap:12px; padding:14px; margin:0 18px 12px;
+  }
+  .menu-item .thumb{
+    width:64px; height:64px; border-radius:12px; flex-shrink:0;
+    display:flex; align-items:center; justify-content:center; font-size:26px;
+  }
+  .menu-item .info{flex:1; min-width:0;}
+  .menu-item h4{font-size:14.5px; font-weight:600; margin-bottom:3px;}
+  .menu-item p{font-size:11.5px; color:var(--muted); line-height:1.4; margin-bottom:8px;}
+  .menu-item .row{display:flex; align-items:center; justify-content:space-between;}
+  .price{font-weight:700; color:var(--forest-dark); font-size:13.5px;}
+  .add-btn{
+    width:var(--tap); height:var(--tap); border-radius:12px;
+    background:var(--terracotta); color:#fff;
+    display:flex; align-items:center; justify-content:center;
+    box-shadow:0 4px 10px rgba(138,66,34,0.28);
+  }
+  .add-btn svg{width:20px; height:20px; stroke:currentColor; stroke-width:2.6;}
+
+  /* Courts */
+  .date-strip{display:flex; gap:8px; overflow-x:auto; padding:4px 18px 16px; scrollbar-width:none;}
+  .date-strip::-webkit-scrollbar{display:none;}
+  .date-chip{
+    min-width:58px; padding:10px 6px; min-height:var(--tap); border-radius:14px; background:var(--white);
+    text-align:center; box-shadow:var(--shadow-sm); flex-shrink:0;
+  }
+  .date-chip .dow{font-size:10px; color:var(--muted); font-weight:600; text-transform:uppercase;}
+  .date-chip .dnum{font-size:16px; font-weight:700; color:var(--forest-dark); margin-top:3px;}
+  .date-chip[aria-pressed="true"]{background:var(--forest);}
+  .date-chip[aria-pressed="true"] .dow{color:var(--gold-text);}
+  .date-chip[aria-pressed="true"] .dnum{color:var(--cream);}
+
+  .court-block{margin:0 18px 18px;}
+  .court-title{
+    display:flex; align-items:center; justify-content:space-between;
+    font-size:14px; font-weight:700; color:var(--forest-dark); margin-bottom:10px;
+  }
+  .court-title span.sub{font-size:11px; color:var(--muted); font-weight:500;}
+  .slot-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:8px;}
+  .slot{
+    padding:12px 4px; min-height:var(--tap); border-radius:10px; text-align:center;
+    font-size:12px; font-weight:600;
+    background:var(--white); color:var(--forest-dark); box-shadow:var(--shadow-sm);
+    border:1.5px solid transparent;
+  }
+  .slot:disabled{
+    background:var(--cream-dark); color:var(--muted-soft); text-decoration:line-through;
+    box-shadow:none; cursor:not-allowed;
+  }
+  .slot[aria-pressed="true"]{background:var(--terracotta); color:#fff; border-color:var(--terracotta-dark);}
+  .court-empty{font-size:12px; color:var(--muted); padding:8px 0;}
+
+  /* Gallery */
+  .gallery-grid{display:grid; grid-template-columns:1fr 1fr; gap:10px; padding:0 18px;}
+  .g-photo{
+    aspect-ratio:1/1; border-radius:14px; display:flex; align-items:center; justify-content:center;
+    position:relative; overflow:hidden; box-shadow:var(--shadow-sm);
+  }
+  .g-photo .cap{
+    position:absolute; bottom:0; left:0; right:0; padding:10px;
+    background:linear-gradient(180deg, transparent, rgba(0,0,0,0.72));
+    color:#fff; font-size:11px; font-weight:600;
+  }
+  .g-photo svg{width:26px; height:26px; stroke:rgba(255,255,255,0.9); position:relative; z-index:1;}
+  .g-img{position:absolute; inset:0; width:100%; height:100%; object-fit:cover;}
+  /* Once a real photo loads, the placeholder icon gets out of its way. */
+  .g-photo.has-photo .g-placeholder{display:none;}
+
+  /* Contact */
+  .info-row{
+    display:flex; gap:12px; align-items:flex-start; padding:14px 0; border-bottom:1px solid var(--cream-dark);
+  }
+  .info-row:last-child{border-bottom:none;}
+  .info-row .ic{
+    width:36px; height:36px; border-radius:10px; background:var(--cream-dark);
+    display:flex; align-items:center; justify-content:center; flex-shrink:0;
+  }
+  .info-row .ic svg{width:17px; height:17px; stroke:var(--forest);}
+  .info-row h4{font-size:13.5px; font-weight:600; margin-bottom:2px;}
+  .info-row p{font-size:12px; color:var(--muted); line-height:1.5;}
+  .info-row a{text-decoration:underline; text-underline-offset:2px;}
+  .hours-table{width:100%; font-size:12.5px; border-collapse:collapse;}
+  .hours-table tr{border-bottom:1px solid var(--cream-dark);}
+  .hours-table th{text-align:left; font-weight:600; padding:8px 0; color:var(--ink);}
+  .hours-table td{padding:8px 0; text-align:right; color:var(--muted); font-weight:600;}
+
+  .map-box{
+    height:130px; border-radius:14px; margin-top:4px;
+    background:
+      linear-gradient(180deg, rgba(36,70,58,0.15), rgba(36,70,58,0.35)),
+      repeating-linear-gradient(45deg, #d7e3da, #d7e3da 10px, #cddcd2 10px, #cddcd2 20px);
+    display:flex; align-items:center; justify-content:center;
+    position:relative;
+  }
+  .map-box svg{width:26px; height:26px; stroke:var(--terracotta); fill:var(--terracotta);}
+
+  /* Bottom nav */
+  .bottomnav{
+    position:absolute; bottom:0; left:0; right:0;
+    background:var(--white);
+    display:flex; justify-content:space-around;
+    padding:6px 4px calc(6px + env(safe-area-inset-bottom));
+    box-shadow:0 -4px 18px rgba(23,49,41,0.10);
+    z-index:20;
+  }
+  .navbtn{
+    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px;
+    color:var(--muted); font-size:10px; font-weight:600;
+    min-height:var(--tap); min-width:var(--tap); padding:6px 8px; border-radius:10px; flex:1;
+  }
+  .navbtn svg{width:20px; height:20px; stroke:var(--muted);}
+  .navbtn[aria-current="page"]{color:var(--terracotta);}
+  .navbtn[aria-current="page"] svg{stroke:var(--terracotta);}
+
+  /* Modal / sheet */
+  .overlay{
+    position:absolute; inset:0; background:rgba(23,49,41,0.55);
+    z-index:40; display:none; align-items:flex-end;
+  }
+  .overlay.show{display:flex;}
+  .sheet{
+    background:var(--cream); width:100%; border-radius:20px 20px 0 0;
+    max-height:88%; overflow-y:auto;
+    padding:20px 18px calc(20px + env(safe-area-inset-bottom));
+    animation:slideUp .25s ease;
+    position:relative;
+  }
+  .sheet:focus{outline:none;}
+  @keyframes slideUp{from{transform:translateY(30px); opacity:0;} to{transform:translateY(0); opacity:1;}}
+  .sheet-handle{width:38px; height:4px; background:#cfc6b4; border-radius:3px; margin:0 auto 16px;}
+  .sheet h3{font-size:17px; font-weight:600; margin-bottom:14px; color:var(--forest-dark); padding-right:44px;}
+  .sheet.centered h3{padding-right:0;}
+  .close-x{
+    position:absolute; top:8px; right:8px;
+    width:var(--tap); height:var(--tap); border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .close-x::before{
+    content:''; position:absolute; width:32px; height:32px; border-radius:50%; background:var(--cream-dark);
+  }
+  .close-x svg{width:15px; height:15px; position:relative; stroke:var(--forest-dark); stroke-width:2.5;}
+
+  .cart-line{display:flex; align-items:center; gap:10px; padding:8px 0; border-bottom:1px solid var(--cream-dark);}
+  .cart-line .ci-thumb{width:44px; height:44px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0;}
+  .cart-line .ci-info{flex:1; min-width:0;}
+  .cart-line h5{font-size:13px; font-weight:600;}
+  .cart-line .ci-price{font-size:11.5px; color:var(--muted);}
+  .qty-ctrl{display:flex; align-items:center; gap:2px;}
+  .qty-ctrl button{
+    width:var(--tap); height:var(--tap); border-radius:10px;
+    font-weight:700; color:var(--forest-dark);
+    display:flex; align-items:center; justify-content:center; position:relative;
+  }
+  .qty-ctrl button::before{
+    content:''; position:absolute; width:30px; height:30px; border-radius:9px; background:var(--cream-dark);
+  }
+  .qty-ctrl button span{position:relative; font-size:16px; line-height:1;}
+  .qty-ctrl button:disabled{opacity:.4; cursor:not-allowed;}
+  .qty-ctrl .qty-val{font-size:13px; font-weight:600; min-width:22px; text-align:center;}
+
+  .field{margin-bottom:14px;}
+  .field label{display:block; font-size:12px; font-weight:600; color:var(--forest-dark); margin-bottom:6px;}
+  .field input, .field select{
+    width:100%; padding:13px; min-height:var(--tap); border-radius:10px;
+    border:1.5px solid #cfc6b4;
+    background:var(--white); font-size:16px; font-family:inherit; color:var(--ink);
+  }
+  .field input:focus, .field select:focus{outline:none; border-color:var(--terracotta); box-shadow:0 0 0 3px rgba(163,80,44,.18);}
+  .field .hint{font-size:11.5px; color:var(--muted); margin-top:5px;}
+  .field .err{font-size:11.5px; color:var(--terracotta-dark); font-weight:600; margin-top:5px; display:none;}
+  .field.invalid .err{display:block;}
+  .field.invalid input, .field.invalid select{border-color:var(--terracotta-dark);}
+
+  .summary-row{display:flex; justify-content:space-between; font-size:13px; padding:6px 0; color:var(--muted);}
+  .summary-row.total{font-size:15px; font-weight:700; color:var(--forest-dark); border-top:1px solid var(--cream-dark); margin-top:6px; padding-top:12px;}
+
+  .empty-state{text-align:center; padding:40px 20px; color:var(--muted);}
+  .empty-state svg{width:44px; height:44px; stroke:#a9b3aa; margin:0 auto 12px;}
+  .empty-state p{font-size:13px;}
+
+  .toast{
+    position:absolute; top:74px; left:50%; transform:translateX(-50%) translateY(-10px);
+    background:var(--forest-dark); color:#fff; padding:11px 18px; border-radius:12px;
+    font-size:12.5px; font-weight:600; box-shadow:var(--shadow); z-index:60;
+    opacity:0; pointer-events:none; transition:all .25s ease;
+    display:flex; align-items:center; gap:8px; max-width:88%;
+  }
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0);}
+  .toast svg{width:15px; height:15px; stroke:var(--gold-text); flex-shrink:0;}
+
+  .confirm-icon{
+    width:64px; height:64px; border-radius:50%; background:var(--forest); margin:6px auto 16px;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .confirm-icon svg{width:30px; height:30px; stroke:var(--gold-text);}
+  .receipt{background:var(--white); border-radius:14px; padding:16px; margin:16px 0;}
+  .receipt .r-row{display:flex; justify-content:space-between; gap:12px; font-size:12.5px; padding:6px 0;}
+  .receipt .r-row span:first-child{color:var(--muted); flex-shrink:0;}
+  .receipt .r-row span:last-child{font-weight:600; color:var(--forest-dark); text-align:right; word-break:break-word;}
+  .dashed{border-top:1.5px dashed var(--cream-dark); margin:8px 0;}
+
+  ::selection{background:var(--gold); color:var(--forest-dark);}
+</style>
+</head>
+<body>
+<a class="skip-link" href="#screens">Skip to main content</a>
+
+<div class="app" id="app">
+
+  <!-- TOP BAR -->
+  <header class="topbar">
+    <div class="brand">
+      <div class="logo-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#173129" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 20l6-10 4 6 3-4 5 8H3z"/><circle cx="17" cy="6" r="2"/></svg>
+      </div>
+      <div>
+        Arquero's
+        <small>Mountain Resort</small>
+      </div>
+    </div>
+    <button class="icon-btn" id="cartBtn" type="button" aria-label="Your order">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+      <span class="badge" id="cartBadge" hidden>0</span>
+    </button>
+  </header>
+
+  <!-- TOAST -->
+  <div class="toast" id="toast" role="status" aria-live="polite">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+    <span id="toastMsg"></span>
+  </div>
+
+  <!-- SCREENS -->
+  <main class="screens" id="screens" tabindex="-1">
+
+    <!-- HOME -->
+    <section class="screen active" id="screen-home" aria-label="Home">
+      <div class="hero">
+        <span class="hero-tag">Est. 2010 &middot; Since the Mountains Called</span>
+        <h1>Fresh air, good food,<br>better rallies.</h1>
+        <p>A mountainside restaurant and pickleball club where every table has a view and every court is booked in seconds.</p>
+        <div class="hero-actions on-dark">
+          <button class="btn btn-gold" type="button" data-nav-to="courts">
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 3v18M3 12h18"/></svg>
+            Book a Court
+          </button>
+          <button class="btn btn-outline" type="button" data-nav-to="menu">View Menu</button>
+        </div>
+      </div>
+
+      <div class="quick-strip">
+        <div class="quick-card">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          <div class="q-label">Open Today</div>
+          <div class="q-value">7 AM &ndash; 9 PM</div>
+        </div>
+        <div class="quick-card">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 20l6-10 4 6 3-4 5 8H3z"/></svg>
+          <div class="q-label">Elevation</div>
+          <div class="q-value">4,200 ft</div>
+        </div>
+        <div class="quick-card">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 3v18M3 12h18"/></svg>
+          <div class="q-label">Courts</div>
+          <div class="q-value">4 Outdoor</div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-head"><h2 id="promoHeading">Today at Arquero's</h2></div>
+        <div class="scroll-row" tabindex="0" role="group" aria-labelledby="promoHeading"
+             data-hscroll aria-describedby="promoHint">
+          <div class="promo-card">
+            <div class="tag">Happy Hour</div>
+            <h3>4&ndash;6 PM Daily</h3>
+            <p>Half-off appetizers on the deck, best seat for sunset.</p>
+          </div>
+          <div class="promo-card" style="background:linear-gradient(135deg,#7a3a1f,#54270f);">
+            <div class="tag">Open Play</div>
+            <h3>Sat &amp; Sun, 8 AM</h3>
+            <p>Drop-in pickleball, all levels welcome. No booking needed.</p>
+          </div>
+          <div class="promo-card" style="background:linear-gradient(135deg,#2b5343,#173129);">
+            <div class="tag">Live Music</div>
+            <h3>Friday Nights</h3>
+            <p>Local acoustic sets on the terrace from 6 PM.</p>
+          </div>
+        </div>
+        <span id="promoHint" class="visually-hidden">Use the left and right arrow keys to scroll through offers.</span>
+      </div>
+
+      <div class="section" style="padding-top:0;">
+        <div class="section-head"><h2>Resort Amenities</h2></div>
+        <div class="amenity-grid">
+          <div class="amenity">
+            <div class="em"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 2l1.6 20h14.8L21 2"/><path d="M3.5 8h17"/></svg></div>
+            <h4>Farm-to-Table Dining</h4>
+            <p>Indoor &amp; deck seating with mountain views.</p>
+          </div>
+          <div class="amenity">
+            <div class="em"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 3v18M3 12h18"/></svg></div>
+            <h4>4 Pickleball Courts</h4>
+            <p>Lit for evening play, pro shop on site.</p>
+          </div>
+          <div class="amenity">
+            <div class="em"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg></div>
+            <h4>Trailside Bar</h4>
+            <p>Craft cocktails &amp; local brews after your match.</p>
+          </div>
+          <div class="amenity">
+            <div class="em"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg></div>
+            <h4>Photo-Worthy Views</h4>
+            <p>Sunrise over the ridge from every court.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- MENU -->
+    <section class="screen" id="screen-menu" aria-label="Restaurant menu">
+      <div class="section" style="padding-bottom:6px;">
+        <div class="section-head"><h2 id="menuHeading">Restaurant Menu</h2></div>
+        <p style="font-size:12.5px; color:var(--muted); margin-top:-8px;">Tap + to add items, then check out from the cart. All prices include VAT.</p>
+      </div>
+      <div class="tabs" id="menuTabs" role="tablist" aria-label="Menu categories" tabindex="0" data-hscroll></div>
+      <div id="menuList"></div>
+    </section>
+
+    <!-- COURTS -->
+    <section class="screen" id="screen-courts" aria-label="Book a court">
+      <div class="section" style="padding-bottom:6px;">
+        <div class="section-head"><h2 id="courtsHeading">Book a Pickleball Court</h2></div>
+        <p style="font-size:12.5px; color:var(--muted); margin-top:-8px;">Pick a day, then choose an open time slot. Court hire includes VAT.</p>
+      </div>
+      <div class="date-strip" id="dateStrip" role="group" aria-label="Choose a date" tabindex="0" data-hscroll></div>
+      <div id="courtList" aria-live="polite"></div>
+    </section>
+
+    <!-- GALLERY -->
+    <section class="screen" id="screen-gallery" aria-label="Gallery">
+      <div class="section" style="padding-bottom:10px;">
+        <div class="section-head"><h2>Gallery</h2></div>
+      </div>
+      <div class="gallery-grid" id="galleryGrid"></div>
+      <div style="height:14px;"></div>
+    </section>
+
+    <!-- CONTACT -->
+    <section class="screen" id="screen-contact" aria-label="Visit us">
+      <div class="section" style="padding-bottom:6px;">
+        <div class="section-head"><h2>Visit Us</h2></div>
+      </div>
+      <div class="section" style="padding-top:0;">
+        <div class="map-box" role="img" aria-label="Map placeholder showing the resort location">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5A2.5 2.5 0 1 1 12 6a2.5 2.5 0 0 1 0 5.5z"/></svg>
+        </div>
+        <div class="card" style="padding:4px 16px; margin-top:14px;">
+          <div class="info-row">
+            <div class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/></svg></div>
+            <div><h4>Address</h4><p>412 Ridgeline Road, Arquero Valley</p></div>
+          </div>
+          <div class="info-row">
+            <div class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.9.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg></div>
+            <div><h4>Phone</h4><p><a href="tel:+15550427710">(555) 042-7710</a></p></div>
+          </div>
+          <div class="info-row">
+            <div class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 6l-10 7L2 6"/><rect x="2" y="4" width="20" height="16" rx="2"/></svg></div>
+            <div><h4>Email</h4><p><a href="mailto:hello@arquerosresort.com">hello@arquerosresort.com</a></p></div>
+          </div>
+        </div>
+      </div>
+      <div class="section" style="padding-top:0;">
+        <div class="section-head"><h2 id="hoursHeading">Hours</h2></div>
+        <div class="card" style="padding:6px 16px;">
+          <table class="hours-table" aria-labelledby="hoursHeading">
+            <tbody>
+              <tr><th scope="row">Restaurant &middot; Mon&ndash;Thu</th><td>7 AM &ndash; 9 PM</td></tr>
+              <tr><th scope="row">Restaurant &middot; Fri&ndash;Sun</th><td>7 AM &ndash; 11 PM</td></tr>
+              <tr><th scope="row">Pickleball Courts</th><td>6 AM &ndash; 9 PM</td></tr>
+              <tr><th scope="row">Pro Shop</th><td>8 AM &ndash; 6 PM</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="section" style="padding-top:0;">
+        <button class="btn btn-primary btn-block" type="button" id="contactBtn">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+          Send Us a Message
+        </button>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- BOTTOM NAV -->
+  <nav class="bottomnav" aria-label="Main">
+    <button class="navbtn" type="button" data-nav="home" aria-current="page">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12l9-9 9 9"/><path d="M5 10v10h14V10"/></svg>
+      Home
+    </button>
+    <button class="navbtn" type="button" data-nav="menu">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 2l1.6 20h14.8L21 2"/><path d="M3.5 8h17"/></svg>
+      Menu
+    </button>
+    <button class="navbtn" type="button" data-nav="courts">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 3v18M3 12h18"/></svg>
+      Courts
+    </button>
+    <button class="navbtn" type="button" data-nav="gallery">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+      Gallery
+    </button>
+    <button class="navbtn" type="button" data-nav="contact">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/></svg>
+      Visit
+    </button>
+  </nav>
+
+  <!-- CART SHEET -->
+  <div class="overlay" id="cartOverlay" data-backdrop-close>
+    <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="cartTitle" tabindex="-1">
+      <div class="sheet-handle" aria-hidden="true"></div>
+      <button class="close-x" type="button" data-close="cartOverlay" aria-label="Close order">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" aria-hidden="true"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+      <h3 id="cartTitle">Your Order</h3>
+      <div id="cartItems"></div>
+      <div id="cartSummary"></div>
+      <div style="margin-top:14px;">
+        <button class="btn btn-primary btn-block" id="checkoutBtn" type="button">Checkout</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CHECKOUT FORM SHEET -->
+  <div class="overlay" id="checkoutOverlay" data-backdrop-close>
+    <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="checkoutTitle" tabindex="-1">
+      <div class="sheet-handle" aria-hidden="true"></div>
+      <button class="close-x" type="button" data-close="checkoutOverlay" aria-label="Close checkout">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" aria-hidden="true"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+      <h3 id="checkoutTitle">Checkout Details</h3>
+      <form id="orderForm" novalidate>
+        <div class="field" id="orderNameField">
+          <label for="orderName">Full Name</label>
+          <input type="text" id="orderName" name="name" placeholder="Your name" autocomplete="name" maxlength="80" required>
+          <span class="err" id="orderNameErr"></span>
+        </div>
+        <div class="field" id="orderPhoneField">
+          <label for="orderPhone">Phone Number</label>
+          <input type="tel" id="orderPhone" name="phone" placeholder="(555) 123-4567" autocomplete="tel" maxlength="25" required>
+          <span class="err" id="orderPhoneErr"></span>
+        </div>
+        <div class="field">
+          <label for="orderType">Order Type</label>
+          <select id="orderType" name="orderType"></select>
+        </div>
+        <button class="btn btn-primary btn-block" type="submit" id="placeOrderBtn">Place Order</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ORDER CONFIRMATION -->
+  <div class="overlay" id="orderConfirmOverlay" data-backdrop-close>
+    <div class="sheet centered" role="dialog" aria-modal="true" aria-labelledby="orderConfirmTitle" tabindex="-1" style="text-align:center;">
+      <div class="sheet-handle" aria-hidden="true"></div>
+      <button class="close-x" type="button" data-close-home aria-label="Close and return home">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" aria-hidden="true"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+      <div class="confirm-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+      <h3 id="orderConfirmTitle">Order Confirmed</h3>
+      <p style="font-size:12.5px; color:var(--muted);">We're firing it up. You'll be notified when it's ready.</p>
+      <div class="receipt" id="orderReceipt" style="text-align:left;"></div>
+      <button class="btn btn-dark btn-block" type="button" data-close-home>Back to Home</button>
+    </div>
+  </div>
+
+  <!-- BOOKING FORM SHEET -->
+  <div class="overlay" id="bookingOverlay" data-backdrop-close>
+    <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="bookingTitle" tabindex="-1">
+      <div class="sheet-handle" aria-hidden="true"></div>
+      <button class="close-x" type="button" data-close="bookingOverlay" aria-label="Close booking">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" aria-hidden="true"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+      <h3 id="bookingTitle">Confirm Your Booking</h3>
+      <div class="receipt" id="bookingPreview"></div>
+      <form id="bookingForm" novalidate>
+        <div class="field" id="bookNameField">
+          <label for="bookName">Full Name</label>
+          <input type="text" id="bookName" name="name" placeholder="Your name" autocomplete="name" maxlength="80" required>
+          <span class="err" id="bookNameErr"></span>
+        </div>
+        <div class="field" id="bookPhoneField">
+          <label for="bookPhone">Phone Number</label>
+          <input type="tel" id="bookPhone" name="phone" placeholder="(555) 123-4567" autocomplete="tel" maxlength="25" required>
+          <span class="err" id="bookPhoneErr"></span>
+        </div>
+        <div class="field">
+          <label for="bookParty">Party Size</label>
+          <select id="bookParty" name="partySize"></select>
+        </div>
+        <button class="btn btn-primary btn-block" type="submit" id="confirmBookingBtn">Confirm Booking</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- BOOKING CONFIRMATION -->
+  <div class="overlay" id="bookingConfirmOverlay" data-backdrop-close>
+    <div class="sheet centered" role="dialog" aria-modal="true" aria-labelledby="bookingConfirmTitle" tabindex="-1" style="text-align:center;">
+      <div class="sheet-handle" aria-hidden="true"></div>
+      <button class="close-x" type="button" data-close-home aria-label="Close and return home">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" aria-hidden="true"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+      <div class="confirm-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+      <h3 id="bookingConfirmTitle">Court Booked</h3>
+      <p style="font-size:12.5px; color:var(--muted);">See you on the court. Arrive 10 minutes early.</p>
+      <div class="receipt" id="bookingReceipt" style="text-align:left;"></div>
+      <button class="btn btn-dark btn-block" type="button" data-close-home>Back to Home</button>
+    </div>
+  </div>
+
+</div>
+
+<script src="safe-html.js" defer></script>
+<script src="money.js" defer></script>
+<script src="app.js" defer></script>
+</body>
+</html>

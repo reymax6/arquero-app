@@ -1,0 +1,17 @@
+{
+  "name": "Arquero's Mountain Resort",
+  "short_name": "Arquero's",
+  "description": "Order from the restaurant and book a pickleball court at Arquero's Mountain Resort.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#faf5ea",
+  "theme_color": "#24463a",
+  "categories": ["food", "sports", "travel"],
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

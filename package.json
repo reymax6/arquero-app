@@ -1,0 +1,33 @@
+{
+  "name": "arquero-resort-app",
+  "version": "1.3.0",
+  "description": "Arquero's Mountain Resort - restaurant ordering and pickleball court booking app",
+  "main": "server/index.js",
+  "scripts": {
+    "start": "node server/index.js",
+    "seed": "node server/seed.js",
+    "backup": "node server/backup.js",
+    "test": "node tests/run-all.js",
+    "test:api": "bash tests/api-attacks.sh",
+    "test:a11y": "node tests/a11y-check.js",
+    "test:keyboard": "node tests/kb-check.js",
+    "test:xss": "node tests/xss-and-flows.js",
+    "test:timezone": "node tests/timezone.js",
+    "test:focus": "node tests/focus.js",
+    "test:admin": "node tests/admin-check.js",
+    "shots": "node tests/shots.js",
+    "test:cart": "node tests/cart-and-ticket.js",
+    "test:menu": "node tests/menu-admin.js"
+  },
+  "dependencies": {
+    "better-sqlite3": "^11.3.0",
+    "express": "^4.19.2"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.10.0",
+    "playwright": "^1.56.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

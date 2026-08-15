@@ -1,0 +1,33 @@
+# Render.com blueprint — https://render.com/docs/blueprint-spec
+#
+# Push this repo to GitHub, then in Render choose "New > Blueprint" and point
+# it at the repo. Everything below is set up for you, including the persistent
+# disk that keeps the database alive across deploys.
+#
+# One manual step afterwards: open the service's Environment tab and set
+# ADMIN_PASSWORD. Render generates SESSION_SECRET automatically.
+
+services:
+  - type: web
+    name: arqueros-resort
+    runtime: node
+    plan: starter          # the free plan has no persistent disk, so the database would reset
+    region: singapore      # closest Render region to the Philippines
+    buildCommand: npm ci && npm run seed
+    startCommand: npm start
+    healthCheckPath: /api/health
+    disk:
+      name: arquero-data
+      mountPath: /data
+      sizeGB: 1
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DB_PATH
+        value: /data/arquero.db
+      - key: BACKUP_DIR
+        value: /data/backups
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: ADMIN_PASSWORD
+        sync: false        # set this yourself in the dashboard; never commit it
